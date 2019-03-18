@@ -1,0 +1,14 @@
+﻿using AdvertApi.models;
+using AdvertApi.Services.Models;
+using AutoMapper;
+
+namespace AdvertApi.Services
+{
+    public class AdvertProfile : Profile
+    {
+        public AdvertProfile()
+        {
+            CreateMap<AdvertModel, AdvertDBModel>();
+        }
+    }
+}
