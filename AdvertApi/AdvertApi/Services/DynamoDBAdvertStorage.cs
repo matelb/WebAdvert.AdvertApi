@@ -8,6 +8,7 @@ using AutoMapper;
 using AdvertApi.Services.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon;
 
 namespace AdvertApi.Services
 {
@@ -29,7 +30,7 @@ namespace AdvertApi.Services
             dbModel.CreationDateTime = DateTime.Now;
             dbModel.Status = AdvertStatus.Pending;
 
-            using (var client  = new AmazonDynamoDBClient())
+            using (var client  = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
             {
                 using(var context = new DynamoDBContext(client))
                 {
@@ -42,7 +43,7 @@ namespace AdvertApi.Services
 
         public async Task<bool> Confirm(ConfirmAdvertModel model)
         {
-            using(var client = new AmazonDynamoDBClient())
+            using(var client = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
             {
                 using(var context = new DynamoDBContext(client))
                 {
@@ -63,6 +64,20 @@ namespace AdvertApi.Services
                 }
             }
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> CheckHealthAsync()
+        {
+            try { 
+                using (var client = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
+                {
+                    var tableData = await client.DescribeTableAsync("Adverts");
+                    return tableData.Table.TableStatus.ToString().ToLower() == "active";
+                }
+            }catch(Exception ex)
+            {
+                return false;
+            }
         }
     }
 }
