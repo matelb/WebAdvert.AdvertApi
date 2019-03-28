@@ -9,6 +9,7 @@ using AdvertApi.Services.Models;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon;
+using System.IO;
 
 namespace AdvertApi.Services
 {
@@ -76,6 +77,7 @@ namespace AdvertApi.Services
                 }
             }catch(Exception ex)
             {
+                File.WriteAllText("error.txt", ex.Message);
                 return false;
             }
         }
