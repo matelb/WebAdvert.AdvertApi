@@ -25,28 +25,27 @@ namespace AdvertApi.Services
 
         public async Task<string> Add(AdvertModel model)
         {
-
             var dbModel = mapper.Map<AdvertDBModel>(model);
-            dbModel.ID = new Guid().ToString();
+            dbModel.ID = Guid.NewGuid().ToString();
             dbModel.CreationDateTime = DateTime.Now;
             dbModel.Status = AdvertStatus.Pending;
 
             using (var client  = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
             {
-                using(var context = new DynamoDBContext(client))
+                using (var context = new DynamoDBContext(client))
                 {
                     await context.SaveAsync(dbModel);
                 }
             }
-
             return dbModel.ID;
         }
 
         public async Task<bool> Confirm(ConfirmAdvertModel model)
         {
             using(var client = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
-            {
-                using(var context = new DynamoDBContext(client))
+            {                
+
+                using (var context = new DynamoDBContext(client))
                 {
                     var record = await context.LoadAsync<AdvertDBModel>(model.Id);
                     if(record == null)
@@ -67,17 +66,20 @@ namespace AdvertApi.Services
             throw new NotImplementedException();
         }
 
+
         public async Task<bool> CheckHealthAsync()
         {
             try { 
                 using (var client = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
                 {
+                    //File.WriteAllText(@"C:\Data\entra.txt", "entra");
                     var tableData = await client.DescribeTableAsync("Adverts");
+                    //File.WriteAllText(@"C:\Data\good.txt", tableData.Table.TableStatus.ToString().ToLower());
                     return tableData.Table.TableStatus.ToString().ToLower() == "active";
                 }
             }catch(Exception ex)
             {
-                File.WriteAllText("error.txt", ex.Message);
+                File.WriteAllText(@"C:\Data\error.txt", ex.Message);
                 return false;
             }
         }
