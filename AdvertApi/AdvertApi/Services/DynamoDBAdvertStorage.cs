@@ -26,9 +26,10 @@ namespace AdvertApi.Services
         public async Task<string> Add(AdvertModel model)
         {
             var dbModel = mapper.Map<AdvertDBModel>(model);
-            dbModel.ID = Guid.NewGuid().ToString();
+            dbModel.Id = Guid.NewGuid().ToString();
             dbModel.CreationDateTime = DateTime.Now;
             dbModel.Status = AdvertStatus.Pending;
+            dbModel.FilePath = $"{dbModel.Id}/{model.FilePath}";
 
             using (var client  = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
             {
@@ -37,7 +38,7 @@ namespace AdvertApi.Services
                     await context.SaveAsync(dbModel);
                 }
             }
-            return dbModel.ID;
+            return dbModel.Id;
         }
 
         public async Task<bool> Confirm(ConfirmAdvertModel model)
@@ -61,6 +62,27 @@ namespace AdvertApi.Services
                     {
                         await context.DeleteAsync(record);
                     }
+                }
+                //I don't know if it's ok --> return true¿?
+                return true;
+            }
+            throw new NotImplementedException();
+        }
+
+        public async Task<AdvertModel> Get(string Id)
+        {
+            using (var client = new AmazonDynamoDBClient(RegionEndpoint.USEast2))
+            {
+
+                using (var context = new DynamoDBContext(client))
+                {
+                    var record = await context.LoadAsync<AdvertDBModel>(Id);
+                    if (record == null)
+                    {
+                        throw new KeyNotFoundException($"A record with ID{Id} was not found");
+                    }
+                    var advertModel = mapper.Map<AdvertDBModel, AdvertModel>(record);
+                    return advertModel;
                 }
             }
             throw new NotImplementedException();

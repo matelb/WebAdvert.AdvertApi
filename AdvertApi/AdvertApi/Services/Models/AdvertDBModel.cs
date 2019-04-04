@@ -11,7 +11,7 @@ namespace AdvertApi.Services.Models
     public class AdvertDBModel
     {
         [DynamoDBHashKey]
-        public string ID { get; set; }
+        public string Id { get; set; }
 
         [DynamoDBProperty]
         public string Title { get; set; }
@@ -27,5 +27,8 @@ namespace AdvertApi.Services.Models
 
         [DynamoDBProperty]
         public AdvertStatus Status { get; set; }
+
+        [DynamoDBProperty]
+        public string FilePath { get; set; }
     }
 }

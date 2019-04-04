@@ -9,6 +9,7 @@ using Amazon;
 using Amazon.SimpleNotificationService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -74,20 +75,21 @@ namespace AdvertApi.Controllers
             return new OkResult();
         }
 
-        private Task RaiseAdvertConfirmMessage(ConfirmAdvertModel model)
+        private async Task RaiseAdvertConfirmMessage(ConfirmAdvertModel model)
         {
 
             var topicArn = configuration.GetValue<string>("TopicARN");
-            var adverModel = await advertStorageService.g
-            using(var client = new AmazonSimpleNotificationServiceClient(RegionEndpoint.USEast2))
+            var adverModel = await advertStorageService.Get(model.Id);
+            using (var client = new AmazonSimpleNotificationServiceClient(RegionEndpoint.USEast2))
             {
                 var message = new AdvertConfirmMessage
                 {
-                    ID= model.Id,
-                    Title = model.
-                }
-                client.PublishAsync(topicArn: topicArn, message: "");
-            }
+                    ID = model.Id,
+                    Title = adverModel.Title
+                };
+                var messageJson = JsonConvert.SerializeObject(message); 
+                await client.PublishAsync(topicArn: topicArn, message: messageJson);
+            }          
         }
     }
 }

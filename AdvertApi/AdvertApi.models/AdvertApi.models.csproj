@@ -8,6 +8,8 @@
     <PackageProjectUrl>https://github.com/matelb/WebAdvert.AdvertApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/matelb/WebAdvert.AdvertApi</RepositoryUrl>
     <PackageId>AdvertApi.Models.Matelb</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
 </Project>
